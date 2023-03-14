@@ -15,22 +15,19 @@ DATA = "data/"
 
 
 def _url_replaces(url: str):
-    # data = {
-    #     ":": "%3A",
-    #     "=": "%3D",
-    #     "?": "%3F",
-    #     # "/": "\\%\\2\\F",
-    #     "&": "%26",
-    #     " ": "%20",
-    # }
-    # for key, value in data.items():
-    #     url = url.replace(key, value)
-    # return url
+    if "?" in url:
+        url = url.split("?")[:1][0]
+    without_name = url.replace("https://tayga.city/", "")
+    if without_name == "":
+        return req.pathname2url(url)
+    return req.pathname2url(without_name)
+
+
+def _url_pretty(url):
     return req.pathname2url(url)
 
 
 def _url_builder(extra_url, **kwargs):
-    extra_url = _url_replaces(extra_url)
     url_without_args = f"{main_url}{extra_url}"
     args = []
     for arg, value in kwargs.items():
@@ -88,7 +85,7 @@ def get_excel_cells():
 
 
 def get_snaps_timesplamps(url):
-    url = _url_replaces(url)
+    url = _url_pretty(url)
     api_scaps = session.get(
         _url_builder(
             "__wb/calendarcaptures/2",
@@ -120,11 +117,30 @@ def get_all_urls():
             _="1678811637944",
         )
     ).json()[1:]
-    urls = []
+    urls = set()
     for url in api_urls:
         if url[1] == "text/html":
-            urls.append(url[0])
+            urls.add(url[0])
     return urls
+    # for url in api_urls:
+    #     if url[1] == "text/html":
+    #         new_url = _url_replaces(url[0])
+    #         if new_url.count("/") >= 1:
+    #             new_item = True
+    #             for item in urls:
+    #                 if new_url.split("/")[0] in item:
+    #                     new_item = False
+    #             if new_item:
+    #                 urls.add(new_url)
+    #         else:
+    #             urls.add(new_url)
+    # final_set = set()
+    # for url in urls:
+    #     if "http" not in url:
+    #         final_set.add("https://tayga.city/" + url)
+    #     else:
+    #         final_set.add(url)
+    # return final_set
 
 
 def is_files_to_download(files):
