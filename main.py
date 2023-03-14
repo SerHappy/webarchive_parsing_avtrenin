@@ -3,6 +3,7 @@ import os
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+import urllib.request as req
 
 main_url = "https://web.archive.org/"
 session = requests.Session()
@@ -14,17 +15,18 @@ DATA = "data/"
 
 
 def _url_replaces(url: str):
-    data = {
-        ":": "%3A",
-        "=": "%3D",
-        "?": "%3F",
-        # "/": "\\%\\2\\F",
-        "&": "%26",
-        " ": "%20",
-    }
-    for key, value in data.items():
-        url = url.replace(key, value)
-    return url
+    # data = {
+    #     ":": "%3A",
+    #     "=": "%3D",
+    #     "?": "%3F",
+    #     # "/": "\\%\\2\\F",
+    #     "&": "%26",
+    #     " ": "%20",
+    # }
+    # for key, value in data.items():
+    #     url = url.replace(key, value)
+    # return url
+    return req.pathname2url(url)
 
 
 def _url_builder(extra_url, **kwargs):
